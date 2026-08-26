@@ -10,6 +10,9 @@ Praktikum Pemrograman Web (OBE)
 ## Deskripsi Proyek
 Proyek awal untuk praktikum Pemrograman Web, berisi konfigurasi dasar lingkungan pengembangan lokal dan struktur file HTML sederhana.
 
+## Studi Kasus Proyek
+Sistem Informasi UMKM Pesisir (Pendataan & Promosi Produk Lokal)
+
 ## Teknologi yang Digunakan
 - PHP 8.4
 - Apache (via Laragon)
