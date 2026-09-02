@@ -1,37 +1,89 @@
 <!doctype html>
 <html lang="id">
 <head>
- <meta charset="utf-8">
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <meta name="description" content="Portal inventaris laboratorium Teknik Komputer">
- <title>WebLab - Inventaris Laboratorium</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistem absensi modern berbasis QR code">
+  <title>AbsensiQR - Absensi Lebih Mudah Dengan QR Code</title>
 </head>
 <body>
-<header>
- <a href="#main">Lewati ke konten utama</a>
- <h1>WebLab</h1>
- <nav aria-label="Navigasi utama">
- <a href="#layanan">Layanan</a>
- <a href="#kontak">Kontak</a>
- </nav>
-</header>
-<main id="main">
- <section id="layanan">
- <h2>Layanan Inventaris</h2>
- <article>
- <h3>Pencatatan Peralatan</h3>
- <p>Mencatat data alat dan status kondisi.</p>
- </article>
- </section>
- <section id="kontak">
- <h2>Kontak</h2>
- <form>
- <label for="email">Email</label>
- <input id="email" name="email" type="email" required>
- <button type="submit">Kirim</button>
- </form>
- </section>
-</main>
-<footer><p>&copy; 2026 WebLab</p></footer>
+
+  <!-- Header & Navigasi -->
+  <header>
+    <a href="#main">Lewati ke konten utama</a>
+    <h1>AbsensiQR</h1>
+    <nav aria-label="Navigasi Utama">
+      <a href="#beranda">Beranda</a>
+      <a href="#login">Login</a>
+      <a href="#daftar">Daftar</a>
+    </nav>
+  </header>
+
+  <!-- Konten Utama -->
+  <main id="main">
+
+    <!-- Section 1: Hero Section -->
+    <section id="beranda">
+      <article>
+        <h2>Absensi Lebih Mudah Dengan QR Code</h2>
+        <p>Sistem absensi modern yang aman dan praktis untuk guru, dosen, siswa, dan mahasiswa.</p>
+        <p>
+          <a href="#login">Login</a>
+          <a href="#daftar">Daftar</a>
+        </p>
+      </article>
+      <figure>
+        <img src="Ilustrasi_qr_code.png" alt="Ilustrasi pemindaian QR Code di smartphone">
+      </figure>
+    </section>
+
+    <!-- Section 2: Keunggulan Layanan -->
+    <section id="fitur">
+      <h2>Keunggulan Layanan</h2>
+      
+      <article>
+        <h3>Berbasis QR Code</h3>
+        <p>Siswa dan mahasiswa cukup scan QR untuk absen.</p>
+      </article>
+
+      <article>
+        <h3>Aman</h3>
+        <p>Data tersimpan dengan aman di database.</p>
+      </article>
+
+      <article>
+        <h3>Mudah Digunakan</h3>
+        <p>Interface sederhana dan responsif.</p>
+      </article>
+    </section>
+
+    <!-- Section 3: Form Hubungi Kami (Tanpa Div) -->
+    <section id="kontak">
+      <h2>Hubungi Kami</h2>
+      <p>Punya pertanyaan seputar layanan AbsensiQR? Kirimkan pesan Anda.</p>
+      <form action="#" method="POST">
+        <p>
+          <label for="nama">Nama</label>
+          <input id="nama" name="nama" type="text" placeholder="Masukkan nama Anda" required>
+        </p>
+        <p>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="nama@contoh.com" required>
+        </p>
+        <p>
+          <label for="pesan">Pesan</label>
+          <textarea id="pesan" name="pesan" rows="3" placeholder="Tulis pesan Anda..." required></textarea>
+        </p>
+        <button type="submit">Kirim Pesan</button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 AbsensiQR. All rights reserved.</p>
+  </footer>
+
 </body>
 </html>
