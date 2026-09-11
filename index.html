@@ -1,10 +1,12 @@
 <!doctype html>
 <html lang="id">
-<>
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Sistem absensi modern berbasis QR code">
   <title>AbsensiQR - Absensi Lebih Mudah Dengan QR Code</title>
+  
+  <!-- Memanggil file styles.css -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,14 +14,12 @@
   <!-- Header & Navigasi -->
   <header>
     <a href="#main">Lewati ke konten utama</a>
+    <p><strong>AbsensiQR</strong></p>
     
-    <!-- 1. Gambar Informatif (Logo Layanan) -->
-    <img src="Ilustrasi_qr_code.png" alt="Logo resmi layanan publik AbsensiQR" width="30">
-    
-    <h1>AbsensiQR</h1>
+    <!-- Navigation dengan Flexbox Wrap -->
     <nav aria-label="Navigasi Utama">
       <a href="#beranda">Beranda</a>
-      <a href="#login">Login</a>
+      <a href="#Login">Login</a>
       <a href="#Daftar">Daftar</a>
     </nav>
   </header>
@@ -27,52 +27,52 @@
   <!-- Konten Utama -->
   <main id="main">
 
-    <!-- Section 1: Hero Section -->
-    <section id="beranda">
+    <!-- Section 1: Hero Section (Tempat Komponen Hero & Perbandingan Unit) -->
+    <section id="beranda" class="hero">
       <article>
-        <h2>Absensi Lebih Mudah Dengan QR Code</h2>
+        <!-- Font clamp() & Border px -->
+        <h1>Absensi Lebih Mudah Dengan QR Code</h1>
+        <!-- Spasi rem -->
         <p>Sistem absensi modern yang aman dan praktis untuk guru, dosen, siswa, dan mahasiswa di wilayah pesisir dan perbatasan.</p>
         <p>
-          <a href="#Login">Login</a>
-          <a href="#Daftar">Daftar</a>
+          <a href="#Login" class="btn-hero">Login</a>
+          <a href="#Daftar" class="btn-hero">Daftar</a>
         </p>
       </article>
+      
       <figure>
-        <!-- 2. Gambar Informatif (Ilustrasi Utama) -->
+        <!-- Gambar dengan Lebar % -->
         <img src="Ilustrasi_qr_code.png" alt="Ilustrasi pemindaian QR Code absensi di smartphone">
       </figure>
-      
-      <!-- 3. Gambar Dekoratif 1 (Garis/Hiasan Pesisir) -->
-      <img src="Ilustrasi_qr_code.png" alt="" aria-hidden="true" width="100">
     </section>
 
-    <!-- Section 2: Keunggulan Layanan -->
+    <!-- Section 2: Keunggulan Layanan (Layout Grid 1 Kolom Mobile -> 3 Kolom Desktop) -->
     <section id="fitur">
       <h2>Keunggulan Layanan</h2>
       
-      <article>
-        <h3>Berbasis QR Code</h3>
-        <img src="Ilustrasi_qr_code.png" alt="" aria-hidden="true" width="50">
-        <p>Siswa dan mahasiswa cukup scan QR untuk absen.</p>
-      </article>
+      <div class="cards-grid">
+        <article class="card">
+          <h3>Berbasis QR Code</h3>
+          <p>Siswa dan mahasiswa cukup scan QR untuk absen.</p>
+        </article>
 
-      <article>
-        <h3>Aman</h3>
-        <img src="Ilustrasi_qr_code.png" alt="" aria-hidden="true" width="50">
-        <p>Data tersimpan dengan aman di database.</p>
-      </article>
+        <article class="card">
+          <h3>Aman</h3>
+          <p>Data tersimpan dengan aman di database.</p>
+        </article>
 
-      <article>
-        <h3>Mudah Digunakan</h3>
-        <img src="Ilustrasi_qr_code.png" alt="" aria-hidden="true" width="50">
-        <p>Interface sederhana dan responsif.</p>
-      </article>
+        <article class="card">
+          <h3>Mudah Digunakan</h3>
+          <p>Interface sederhana dan responsif.</p>
+        </article>
+      </div>
     </section>
 
-    <!-- Section 3: Form Hubungi Kami-->
+    <!-- Section 3: Form Hubungi Kami -->
     <section id="kontak">
       <h2>Hubungi Kami</h2>
       <p>Punya pertanyaan seputar layanan AbsensiQR? Kirimkan pesan Anda.</p>
+      
       <form action="#" method="POST">
         <p>
           <label for="nama">Nama</label>
@@ -95,8 +95,6 @@
   <!-- Footer -->
   <footer>
     <p>&copy; 2026 AbsensiQR. All rights reserved.</p>
-
-    <!-- 5. Gambar Berfungsi Sebagai Link (Menuju GitHub Repositori) -->
     <a href="https://github.com/nazwasalwa595-art/pemweb-obe">
       <img src="Ilustrasi_qr_code.png" alt="Kunjungi repositori GitHub AbsensiQR" width="24">
     </a>
