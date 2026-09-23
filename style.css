@@ -221,3 +221,68 @@ textarea:focus-visible {
   outline: 3px solid #111111;
   outline-offset: 3px;
 }
+
+/* sFIX MODUL 5: TEMA GELAP (MENGGUNAKAN DATASET THEME) */
+html[data-theme="dark"] body {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] header,
+html[data-theme="dark"] main,
+html[data-theme="dark"] section,
+html[data-theme="dark"] article,
+html[data-theme="dark"] #kontak,
+html[data-theme="dark"] #theme-button,
+html[data-theme="dark"] .btn-filter {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] label {
+  color: #60a5fa !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
+/* STYLING LATIHAN E MODUL 5: INPUT SEARCH, DETAIL & ITEMS PER PAGE */
+#filter-container input[type="search"],
+#filter-container select {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: var(--radius-sm, 4px);
+  background-color: var(--surface, #ffffff);
+  color: var(--text-dark, #0f172a);
+}
+
+.btn-detail {
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-detail:hover {
+  background-color: #1d4ed8;
+}
+
+/* Styling Dark Theme untuk Element Tambahan */
+html[data-theme="dark"] #filter-container input[type="search"],
+html[data-theme="dark"] #filter-container select {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
