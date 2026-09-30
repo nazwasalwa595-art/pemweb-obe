@@ -92,6 +92,92 @@
       <section id="daftar-alat" class="cards-grid"></section>
     </section>
 
+<!-- SECTION BARU (Modul 6): Form Tambah Data Alat Inventaris -->
+    <section id="form-inventaris-section">
+      <h2>Tambah Data Alat Inventaris</h2>
+
+      <!-- Ringkasan Pesan Error/Sukses Global -->
+      <p id="form-summary" aria-live="polite"></p>
+
+      <!-- Form dengan novalidate agar validasi ditangani sepenuhnya oleh JavaScript -->
+      <form id="form-alat" action="#" method="POST" novalidate>
+        <!-- Field 1: Nama Alat -->
+        <p>
+          <label for="input-nama-alat">Nama Alat *</label>
+          <input 
+            type="text" 
+            id="input-nama-alat" 
+            name="namaAlat" 
+            placeholder="Contoh: Scanner QR Code" 
+            required 
+            aria-describedby="err-nama-alat"
+          >
+          <span id="err-nama-alat" class="error-msg" aria-live="polite"></span>
+        </p>
+
+        <!-- Field 2: Kategori -->
+        <p>
+          <label for="input-kategori">Kategori Alat *</label>
+          <select id="input-kategori" name="kategori" required aria-describedby="err-kategori">
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Perangkat">Perangkat</option>
+            <option value="Kamera">Kamera</option>
+            <option value="Jaringan">Jaringan</option>
+            <option value="Aksesori">Aksesori</option>
+          </select>
+          <span id="err-kategori" class="error-msg" aria-live="polite"></span>
+        </p>
+
+        <!-- Field 3: Jumlah Unit (type="number" & min="1") -->
+        <p>
+          <label for="input-jumlah">Jumlah Unit *</label>
+          <input 
+            type="number" 
+            id="input-jumlah" 
+            name="jumlah" 
+            placeholder="Minimal 1" 
+            min="1" 
+            required 
+            aria-describedby="err-jumlah"
+          >
+          <span id="err-jumlah" class="error-msg" aria-live="polite"></span>
+        </p>
+
+        <!-- Field 4: Kondisi -->
+        <p>
+          <label for="input-kondisi">Kondisi Barang *</label>
+          <select id="input-kondisi" name="kondisi" required aria-describedby="err-kondisi">
+            <option value="">-- Pilih Kondisi --</option>
+            <option value="Baik">Baik</option>
+            <option value="Perlu Cek">Perlu Cek</option>
+            <option value="Rusak">Rusak</option>
+          </select>
+          <span id="err-kondisi" class="error-msg" aria-live="polite"></span>
+        </p>
+
+        <!-- Field 5: Tanggal Perolehan (type="date") -->
+        <p>
+          <label for="input-tanggal">Tanggal Perolehan *</label>
+          <input 
+            type="date" 
+            id="input-tanggal" 
+            name="tanggalPerolehan" 
+            required 
+            aria-describedby="err-tanggal"
+          >
+          <span id="err-tanggal" class="error-msg" aria-live="polite"></span>
+        </p>
+
+        <button type="submit" id="btn-submit-alat">Simpan Data Alat</button>
+      </form>
+
+      <!-- Area Preview Data (Hanya tampil jika validasi lolos) -->
+      <article id="preview-container" hidden>
+        <h3>Preview Data Alat Baru</h3>
+        <p id="preview-content"></p>
+      </article>
+    </section>
+
     <!-- Section 4: Form Hubungi Kami -->
     <section id="kontak">
       <h2>Hubungi Kami</h2>

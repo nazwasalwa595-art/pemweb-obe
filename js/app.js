@@ -4,7 +4,8 @@ import {
   ringkasAbsensi, 
   cariAbsensiSesuaiLokasi, 
   cariPesertaDenganId, 
-  buatStringRingkasan 
+  buatStringRingkasan,
+  validateForm
 } from './utils.js';
 
 // 1. Data inventaris lengkap dari Modul 4
@@ -167,3 +168,93 @@ function inisialisasiFiturTema() {
 document.addEventListener('DOMContentLoaded', () => {
   inisialisasiFiturTema();
 });
+
+
+/* ==========================================================================
+   MODUL 6: EVENT LISTENER SUBMIT & INPUT HANDLING
+   ========================================================================== */
+const formAlat = document.querySelector('#form-alat');
+const formSummary = document.querySelector('#form-summary');
+const previewContainer = document.querySelector('#preview-container');
+const previewContent = document.querySelector('#preview-content');
+
+if (formAlat) {
+  formAlat.addEventListener('submit', (event) => {
+    // Mencegah reload halaman
+    event.preventDefault();
+
+    // Reset pesan error & atribut aksesibilitas sebelumnya
+    const errorSpans = formAlat.querySelectorAll('.error-msg');
+    errorSpans.forEach((span) => (span.textContent = ''));
+
+    const inputs = formAlat.querySelectorAll('input, select');
+    inputs.forEach((input) => input.removeAttribute('aria-invalid'));
+
+    if (formSummary) formSummary.textContent = '';
+    if (previewContainer) previewContainer.hidden = true;
+
+    // Normalisasi Data Input (.trim() & Number())
+    const rawData = new FormData(formAlat);
+    const formData = {
+      namaAlat: rawData.get('namaAlat')?.trim() || '',
+      kategori: rawData.get('kategori') || '',
+      jumlah: Number(rawData.get('jumlah')),
+      kondisi: rawData.get('kondisi') || '',
+      tanggalPerolehan: rawData.get('tanggalPerolehan') || ''
+    };
+
+    const errors = validateForm(formData);
+    const errorKeys = Object.keys(errors);
+
+    // Jika Terdapat Error
+    if (errorKeys.length > 0) {
+      if (formSummary) {
+        formSummary.textContent = `Terdapat ${errorKeys.length} kesalahan pada form. Silakan periksa pesan bantuan di bawah.`;
+        formSummary.style.color = '#dc2626';
+      }
+
+      let firstErrorField = null;
+
+      errorKeys.forEach((key) => {
+        const inputField = formAlat.querySelector(`[name="${key}"]`);
+        const idSpan = `err-${key.replace(/[A-Z]/g, (l) => `-${l.toLowerCase()}`)}`;
+        const errSpan = document.querySelector(`#${idSpan}`);
+
+        if (inputField) {
+          inputField.setAttribute('aria-invalid', 'true');
+          if (!firstErrorField) firstErrorField = inputField;
+        }
+
+        if (errSpan) {
+          errSpan.textContent = errors[key];
+        }
+      });
+
+      // Fokuskan kursor ke field error pertama (Aksesibilitas Keyboard)
+      if (firstErrorField) {
+        firstErrorField.focus();
+      }
+
+      return;
+    }
+
+    // Jika Valid: Tampilkan Preview Data
+    if (previewContainer && previewContent) {
+      previewContent.innerHTML = `
+        <strong>Nama Alat:</strong> ${formData.namaAlat}<br>
+        <strong>Kategori:</strong> ${formData.kategori}<br>
+        <strong>Jumlah:</strong> ${formData.jumlah} unit<br>
+        <strong>Kondisi:</strong> ${formData.kondisi}<br>
+        <strong>Tanggal Perolehan:</strong> ${formData.tanggalPerolehan}
+      `;
+      previewContainer.hidden = false;
+
+      if (formSummary) {
+        formSummary.textContent = 'Data berhasil divalidasi dan siap disimpan!';
+        formSummary.style.color = '#166534';
+      }
+
+      formAlat.reset();
+    }
+  });
+}

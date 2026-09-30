@@ -286,3 +286,126 @@ html[data-theme="dark"] #filter-container select {
   color: #f8fafc !important;
   border-color: #334155 !important;
 }
+
+/* ==========================================================================
+   STYLING FORM DATA ALAT INVENTARIS (MODUL 6)
+   ========================================================================== */
+
+/* Container Utama Form (Beri jarak atas & bawah agar tidak mepet) */
+#form-inventaris-section {
+  background-color: var(--surface, #ffffff);
+  padding: var(--space-lg, 2rem);
+  border-radius: var(--radius, 12px);
+  border: 1px solid var(--border, #cbd5e1);
+  box-shadow: var(--shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.05));
+  
+  /* Memberi jarak yang cukup dengan section Daftar Inventaris Alat di atasnya */
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+#form-inventaris-section h2 {
+  color: var(--text-dark, #0f172a);
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  margin-bottom: 0.5rem;
+}
+
+#form-inventaris-section > p {
+  color: var(--text-muted, #64748b);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Layout (Diatur penuh 100% sampai ujung kanan container) */
+#form-alat {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%; /* Memastikan form melebar penuh */
+  max-width: 100%; /* Menghapus batasan 36rem agar tidak terhenti di tengah */
+}
+
+#form-alat p {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  width: 100%;
+}
+
+#form-alat label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dark, #0f172a);
+}
+
+/* Input, Select, dan Date memanjang penuh sampai ujung */
+#form-alat input[type="text"],
+#form-alat input[type="number"],
+#form-alat input[type="date"],
+#form-alat select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background-color: var(--surface, #ffffff);
+  color: var(--text-dark, #0f172a);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#form-alat input:focus,
+#form-alat select:focus {
+  outline: none;
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* State Validasi Error Accessibility */
+#form-alat input[aria-invalid="true"],
+#form-alat select[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}
+
+.error-msg {
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-height: 1.2rem;
+}
+
+.error-msg:empty {
+  display: none;
+}
+
+/* Tombol Simpan Data */
+#btn-submit-alat {
+  align-self: flex-start;
+  padding: 0.75rem 1.75rem;
+  background-color: var(--primary, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+#btn-submit-alat:hover {
+  background-color: var(--primary-hover, #1d4ed8);
+}
+
+/* Container Preview Data Validasi */
+#preview-container {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius, 12px);
+  color: #166534;
+}
