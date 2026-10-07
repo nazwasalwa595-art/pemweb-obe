@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "nama": "Scanner QR Code",
+    "kategori": "Perangkat",
+    "jumlah": 5,
+    "kondisi": "Baik",
+    "lokasi": "Lab Komputer 1"
+  },
+  {
+    "id": 2,
+    "nama": "Webcam HD Absensi",
+    "kategori": "Kamera",
+    "jumlah": 3,
+    "kondisi": "Baik",
+    "lokasi": "Ruang Kelas 3A"
+  },
+  {
+    "id": 3,
+    "nama": "Tablet Presensi",
+    "kategori": "Perangkat",
+    "jumlah": 2,
+    "kondisi": "Perlu Cek",
+    "lokasi": "Lab Komputer 1"
+  },
+  {
+    "id": 4,
+    "nama": "Kabel LAN UTP",
+    "kategori": "Jaringan",
+    "jumlah": 10,
+    "kondisi": "Perlu Cek",
+    "lokasi": "Lab Komputer 1"
+  },
+  {
+    "id": 5,
+    "nama": "Printer Card ID",
+    "kategori": "Perangkat",
+    "jumlah": 1,
+    "kondisi": "Baik",
+    "lokasi": "Ruang Admin"
+  },
+  {
+    "id": 6,
+    "nama": "Router Wi-Fi 6",
+    "kategori": "Jaringan",
+    "jumlah": 4,
+    "kondisi": "Baik",
+    "lokasi": "Lab Komputer 1"
+  }
+]

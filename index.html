@@ -66,20 +66,21 @@
       </section>
     </section>
 
-    <!-- Section 3: Inventaris Alat (Praktikum Modul 5) -->
+    <!-- Section 3: Inventaris Alat -->
     <section id="inventaris-section">
       <h2>Daftar Inventaris Alat</h2>
 
-      <!-- Pengontrol Filter & Form Sederhana (TANPA DIV) -->
+      <!-- Container Pesan Status & Tombol Retry (Latihan 1) -->
+      <p id="api-message" aria-live="polite"></p>
+
+      <!-- Pengontrol Filter & Input Pencarian (Latihan 2) -->
       <p id="filter-container">
         <button type="button" class="btn-filter" data-filter="Semua">Semua</button>
         <button type="button" class="btn-filter" data-filter="Baik">Baik</button>
         <button type="button" class="btn-filter" data-filter="Perlu Cek">Perlu Cek</button>
 
-        <!-- Input Pencarian (Latihan 1) -->
         <input type="search" id="input-cari" placeholder="Cari nama alat..." aria-label="Cari nama alat">
 
-        <!-- Dropdown Jumlah Item (Latihan 3) -->
         <label for="items-per-page">Tampilkan:</label>
         <select id="items-per-page">
           <option value="5">5 item</option>
@@ -88,9 +89,9 @@
         </select>
       </p>
 
-      <!-- Container Daftar Alat (TANPA DIV) -->
+      <!-- Container Output Data -->
       <section id="daftar-alat" class="cards-grid"></section>
-    </section>
+    </section>      
 
 <!-- SECTION BARU (Modul 6): Form Tambah Data Alat Inventaris -->
     <section id="form-inventaris-section">
