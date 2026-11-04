@@ -1,230 +1,96 @@
-/* js/app.js - Logika Utama AbsensiQR, Modul 5, Modul 6, & Modul 7 (Web API) */
+/* js/app.js - Integrasi Full-Stack CRUD API Modul 11 */
 
-import { 
-  ringkasAbsensi, 
-  cariAbsensiSesuaiLokasi, 
-  cariPesertaDenganId, 
-  buatStringRingkasan,
-  validateForm
-} from './utils.js';
+import { validateForm } from './utils.js';
+
+const API_URL = 'http://localhost/pemweb-obe/api/alats.php';
 
 // Selection DOM
 const daftar = document.querySelector('#daftar-alat');
-const tombolFilter = document.querySelectorAll('[data-filter]');
-const inputCari = document.querySelector('#input-cari');
-const selectItemsPerPage = document.querySelector('#items-per-page');
 const apiMessage = document.querySelector('#api-message');
+const formAlat = document.querySelector('#form-alat');
+const formSummary = document.querySelector('#form-summary');
 
-// State Aplikasi
-let inventaris = []; // Menyimpan data dari API / JSON Lokal
-let filterKondisiSekarang = 'Semua';
-let kataKunciCari = '';
+// Modal Edit DOM
+const dialogEdit = document.querySelector('#dialog-edit');
+const formEditAlat = document.querySelector('#form-edit-alat');
+const btnCancelEdit = document.querySelector('#btn-cancel-edit');
 
-// Ubah ke false agar aplikasi mencoba mengambil data dari internet/API
-const USE_LOCAL_DATA = false;
+let dataInventaris = [];
 
-// Buat URL endpoint-nya SALAH (tambahkan kata "-salah" di ujungnya)
-const endpoint = USE_LOCAL_DATA
-  ? './data/users.json'
-  : 'https://jsonplaceholder.typicode.com/users-salah';
-
-// 
-// MODUL 7: Fungsi Async untuk Memuat Data API (Async/Await, Loading, & Retry State)
-// 
+// ==========================================
+// 1. READ (LOAD DATA DARI API GET)
+// ==========================================
 async function loadInventarisData() {
-  if (!apiMessage) return;
-
-  // 1. Loading State
-  apiMessage.innerHTML = '<span>Memuat data dari API...</span>';
-  apiMessage.style.color = '#1e293b';
+  if (apiMessage) {
+    apiMessage.textContent = 'Memuat data dari database MySQL...';
+    apiMessage.style.color = '#1e293b';
+  }
 
   try {
-    // 2. Fetch Data dari Endpoint
-    const response = await fetch(endpoint);
+    const response = await fetch(API_URL);
+    const result = await response.json();
 
-    // 3. Pengecekan status response.ok
-    if (!response.ok) {
-      throw new Error(`HTTP Error Status: ${response.status}`);
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Gagal memuat data dari server');
     }
 
-    // 4. Parse JSON Response
-    const data = await response.json();
+    dataInventaris = result.data;
 
-    // Normalisasi data jika menggunakan API publik eksternal
-    if (!USE_LOCAL_DATA) {
-      inventaris = data.slice(0, 6).map((user, index) => ({
-        id: user.id,
-        nama: `${user.name} (${user.company?.name || 'Alat QR'})`,
-        kategori: index % 2 === 0 ? 'Perangkat' : 'Kamera',
-        jumlah: Math.floor(Math.random() * 5) + 1,
-        kondisi: index % 3 === 0 ? 'Perlu Cek' : 'Baik',
-        lokasi: user.address?.city || 'Lab Komputer'
-      }));
-    } else {
-      inventaris = data;
+    if (apiMessage) {
+      apiMessage.textContent = `Berhasil memuat ${dataInventaris.length} data alat dari database.`;
+      apiMessage.style.color = '#166534';
     }
 
-    // Pesan Sukses
-    apiMessage.textContent = `Berhasil memuat ${inventaris.length} data.`;
-    terapkanFilterDanRender();
+    renderItems(dataInventaris);
 
   } catch (error) {
     console.error('Fetch Error:', error);
-
-    // 5. Error State & Tombol Retry (Soal Latihan 1 Modul 7)
-    apiMessage.innerHTML = `
-      <span style="color: #dc2626;">Data gagal dimuat dari server. </span>
-      <button type="button" id="btn-retry" style="margin-left: 8px; padding: 4px 8px; cursor: pointer;">
-        Coba Lagi (Retry)
-      </button>
-    `;
-
-    const btnRetry = document.querySelector('#btn-retry');
-    if (btnRetry) {
-      btnRetry.addEventListener('click', loadInventarisData);
+    if (apiMessage) {
+      apiMessage.textContent = 'Gagal terhubung ke API backend.';
+      apiMessage.style.color = '#dc2626';
     }
   }
 }
 
-// 
-// WEB STORAGE: Ambil & Simpan Preferensi Items Per Page
-// 
-const KEY_ITEMS_PER_PAGE = 'absensi_items_per_page';
-const savedItemsPerPage = localStorage.getItem(KEY_ITEMS_PER_PAGE) ?? '5';
-
-if (selectItemsPerPage) {
-  selectItemsPerPage.value = savedItemsPerPage;
-
-  selectItemsPerPage.addEventListener('change', (e) => {
-    const nilaiBaru = e.target.value;
-    localStorage.setItem(KEY_ITEMS_PER_PAGE, nilaiBaru);
-    terapkanFilterDanRender();
-  });
-}
-
-// 
-// FUNGSI RENDER CARDS TO DOM
-// 
+// ==========================================
+// RENDER DOM & TOMBOL ACTION (EDIT & DELETE)
+// ==========================================
 function renderItems(items) {
   if (!daftar) return;
+  daftar.replaceChildren();
 
-  daftar.replaceChildren(); // Bersihkan container secara aman
-
-  const limit = parseInt(selectItemsPerPage ? selectItemsPerPage.value : '5', 10);
-  const itemsTampil = items.slice(0, limit);
-
-  if (itemsTampil.length === 0) {
+  if (!items || items.length === 0) {
     const pesanKosong = document.createElement('p');
-    pesanKosong.textContent = 'Tidak ada data inventaris yang cocok.';
+    pesanKosong.textContent = 'Tidak ada data inventaris yang ditemukan.';
     daftar.append(pesanKosong);
     return;
   }
 
-  for (const item of itemsTampil) {
+  items.forEach((item) => {
     const article = document.createElement('article');
     article.className = 'card';
 
-    const title = document.createElement('h3');
-    title.textContent = item.nama;
+    article.innerHTML = `
+      <h3>${item.nama}</h3>
+      <p>Kategori: <strong>${item.kategori}</strong> | Jumlah: <strong>${item.jumlah} unit</strong> | Kondisi: <strong>${item.kondisi}</strong></p>
+      <div class="card-actions" style="margin-top: 10px; display: flex; gap: 8px;">
+        <button type="button" class="btn-edit" data-id="${item.id}">Edit</button>
+        <button type="button" class="btn-delete" data-id="${item.id}" style="background-color: #dc2626; color: white;">Hapus</button>
+      </div>
+    `;
 
-    const info = document.createElement('p');
-    info.textContent = `${item.kategori} - ${item.jumlah} unit - ${item.kondisi}`;
-
-    const btnDetail = document.createElement('button');
-    btnDetail.type = 'button';
-    btnDetail.className = 'btn-detail';
-    btnDetail.dataset.id = item.id;
-    btnDetail.textContent = 'Detail';
-
-    article.append(title, info, btnDetail);
     daftar.append(article);
-  }
-}
-
-// 
-// MODUL 7 (LATIHAN 2): Filter Lokal tanpa Fetch Ulang
-// 
-function terapkanFilterDanRender() {
-  const hasil = inventaris.filter((item) => {
-    const cocokKondisi = filterKondisiSekarang === 'Semua' || item.kondisi === filterKondisiSekarang;
-    const cocokNama = item.nama.toLowerCase().includes(kataKunciCari.toLowerCase());
-    return cocokKondisi && cocokNama;
-  });
-
-  renderItems(hasil);
-}
-
-// Event Listener Search Real-Time
-if (inputCari) {
-  inputCari.addEventListener('input', (e) => {
-    kataKunciCari = e.target.value;
-    terapkanFilterDanRender();
   });
 }
 
-// Event Listener Filter Kondisi
-tombolFilter.forEach((button) => {
-  button.addEventListener('click', () => {
-    filterKondisiSekarang = button.dataset.filter;
-    terapkanFilterDanRender();
-  });
-});
-
-// Event Delegation Tombol Detail
-if (daftar) {
-  daftar.addEventListener('click', (event) => {
-    if (event.target.classList.contains('btn-detail')) {
-      const idAlat = parseInt(event.target.dataset.id, 10);
-      const detailAlat = inventaris.find((item) => item.id === idAlat);
-
-      if (detailAlat) {
-        alert(`--- DETAIL INVENTARIS ---
-ID: ${detailAlat.id}
-Nama: ${detailAlat.nama}
-Kategori: ${detailAlat.kategori}
-Jumlah: ${detailAlat.jumlah} unit
-Kondisi: ${detailAlat.kondisi}
-Lokasi: ${detailAlat.lokasi}`);
-      }
-    }
-  });
-}
-
-// Web Storage: Preferensi Tema (Light/Dark Mode)
-function inisialisasiFiturTema() {
-  const header = document.querySelector('header');
-  if (!header) return;
-
-  const themeButton = document.createElement('button');
-  themeButton.id = 'theme-button';
-  themeButton.type = 'button';
-  themeButton.textContent = 'Ganti Tema';
-  header.appendChild(themeButton);
-
-  const savedTheme = localStorage.getItem('theme') ?? 'light';
-  document.documentElement.dataset.theme = savedTheme;
-
-  themeButton.addEventListener('click', () => {
-    const currentTheme = document.documentElement.dataset.theme;
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-    document.documentElement.dataset.theme = nextTheme;
-    localStorage.setItem('theme', nextTheme);
-  });
-}
-
-// 
-// MODUL 6: Handling Form Submit & Validasi
-// 
-const formAlat = document.querySelector('#form-alat');
-const formSummary = document.querySelector('#form-summary');
-const previewContainer = document.querySelector('#preview-container');
-const previewContent = document.querySelector('#preview-content');
-
+// ==========================================
+// 2. CREATE (POST DATA KE API DATABASE)
+// ==========================================
 if (formAlat) {
-  formAlat.addEventListener('submit', (event) => {
+  formAlat.addEventListener('submit', async (event) => {
     event.preventDefault();
 
+    // Reset pesan error
     const errorSpans = formAlat.querySelectorAll('.error-msg');
     errorSpans.forEach((span) => (span.textContent = ''));
 
@@ -237,45 +103,152 @@ if (formAlat) {
       tanggalPerolehan: rawData.get('tanggalPerolehan') || ''
     };
 
+    // Validasi Client-Side
     const errors = validateForm(formData);
-    const errorKeys = Object.keys(errors);
-
-    if (errorKeys.length > 0) {
+    if (Object.keys(errors).length > 0) {
       if (formSummary) {
-        formSummary.textContent = `Terdapat ${errorKeys.length} kesalahan pada form. Silakan periksa pesan bantuan di bawah.`;
+        formSummary.textContent = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
         formSummary.style.color = '#dc2626';
       }
-
-      errorKeys.forEach((key) => {
-        const idSpan = `err-${key.replace(/[A-Z]/g, (l) => `-${l.toLowerCase()}`)}`;
-        const errSpan = document.querySelector(`#${idSpan}`);
-        if (errSpan) errSpan.textContent = errors[key];
-      });
       return;
     }
 
-    if (previewContainer && previewContent) {
-      previewContent.innerHTML = `
-        <strong>Nama Alat:</strong> ${formData.namaAlat}<br>
-        <strong>Kategori:</strong> ${formData.kategori}<br>
-        <strong>Jumlah:</strong> ${formData.jumlah} unit<br>
-        <strong>Kondisi:</strong> ${formData.kondisi}<br>
-        <strong>Tanggal Perolehan:</strong> ${formData.tanggalPerolehan}
-      `;
-      previewContainer.hidden = false;
+    // Payload dikirim ke Backend PHP (db: MySQL)
+    const payload = {
+      nama: formData.namaAlat,
+      kategori: formData.kategori,
+      jumlah: formData.jumlah,
+      kondisi: formData.kondisi
+    };
 
-      if (formSummary) {
-        formSummary.textContent = 'Data berhasil divalidasi dan siap disimpan!';
-        formSummary.style.color = '#166534';
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        if (formSummary) {
+          formSummary.textContent = 'Data berhasil disimpan ke database!';
+          formSummary.style.color = '#166534';
+        }
+        formAlat.reset();
+        await loadInventarisData(); // Reload list otomatis dari DB
+      } else {
+        alert(`Gagal menambah data: ${result.message}`);
       }
-
-      formAlat.reset();
+    } catch (err) {
+      console.error('Submit Error:', err);
+      alert('Terjadi kesalahan koneksi ke server saat menyimpan data.');
     }
   });
 }
 
-// Inisialisasi Aplikasi saat DOM Siap
+// ==========================================
+// 3. UPDATE (PUT DATA VIA MODAL EDIT)
+// ==========================================
+function bukaModalEdit(id) {
+  const item = dataInventaris.find((a) => a.id === Number(id));
+  if (!item) return;
+
+  document.querySelector('#edit-id').value = item.id;
+  document.querySelector('#edit-nama').value = item.nama;
+  document.querySelector('#edit-kategori').value = item.kategori;
+  document.querySelector('#edit-jumlah').value = item.jumlah;
+  document.querySelector('#edit-kondisi').value = item.kondisi;
+
+  if (dialogEdit) dialogEdit.showModal();
+}
+
+if (btnCancelEdit && dialogEdit) {
+  btnCancelEdit.addEventListener('click', () => dialogEdit.close());
+}
+
+if (formEditAlat) {
+  formEditAlat.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.querySelector('#edit-id').value;
+
+    const payload = {
+      nama: document.querySelector('#edit-nama').value.trim(),
+      kategori: document.querySelector('#edit-kategori').value,
+      jumlah: Number(document.querySelector('#edit-jumlah').value),
+      kondisi: document.querySelector('#edit-kondisi').value
+    };
+
+    try {
+      const response = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert('Data berhasil diperbarui di database!');
+        if (dialogEdit) dialogEdit.close();
+        await loadInventarisData(); // Reload data
+      } else {
+        alert(`Gagal memperbarui data: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      alert('Terjadi kesalahan koneksi saat memperbarui data.');
+    }
+  });
+}
+
+// ==========================================
+// 4. DELETE (HAPUS DATA DENGAN KONFIRMASI)
+// ==========================================
+async function hapusAlat(id) {
+  if (!confirm('Apakah Anda yakin ingin menghapus data alat ini?')) return;
+
+  try {
+    const response = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      alert('Data berhasil dihapus!');
+      await loadInventarisData();
+    } else {
+      alert(`Gagal menghapus: ${result.message}`);
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('Terjadi kesalahan koneksi saat menghapus data.');
+  }
+}
+
+// Event Delegation untuk Tombol Edit dan Hapus
+if (daftar) {
+  daftar.addEventListener('click', (event) => {
+    const target = event.target;
+    const id = target.dataset.id;
+
+    if (target.classList.contains('btn-edit')) {
+      bukaModalEdit(id);
+    } else if (target.classList.contains('btn-delete')) {
+      hapusAlat(id);
+    }
+  });
+}
+
+// Inisialisasi saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
-  inisialisasiFiturTema();
   loadInventarisData();
 });
