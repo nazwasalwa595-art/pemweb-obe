@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - AbsensiQR</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Absensi<span>QR</span> <small style="font-size: 0.8rem; color: #64748b;">(Panel Pengguna)</small></h1>
+    <nav>
+      <a href="#" id="btn-logout" style="color: #dc2626; font-weight: bold;">Keluar (Logout)</a>
+    </nav>
+  </header>
+
+  <main id="main" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
+    <section class="card" style="border: 1px solid #cbd5e1; padding: 24px; border-radius: 12px; background: #fff;">
+      <h2 id="welcome-title">Selamat Datang di AbsensiQR!</h2>
+      <p id="user-info">Memuat data pengguna...</p>
+    </section>
+  </main>
+
+  <script type="module">
+    // Pengecekan Sesi Login dari LocalStorage
+    const savedName = localStorage.getItem('absensi_user_name');
+    const savedRole = localStorage.getItem('absensi_user_role');
+
+    if (!savedName) {
+      alert('Anda belum login! Silakan login terlebih dahulu.');
+      window.location.href = 'login.html';
+    } else {
+      document.querySelector('#welcome-title').textContent = `Selamat Datang, ${savedName}!`;
+      document.querySelector('#user-info').textContent = `Status Peran: ${savedRole ? savedRole.toUpperCase() : 'PENGGUNA'}`;
+    }
+
+    // Fungsi Logout
+    document.querySelector('#btn-logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.clear();
+      alert('Anda telah keluar dari sistem.');
+      window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,254 +1,221 @@
-/* js/app.js - Integrasi Full-Stack CRUD API Modul 11 */
+/* js/app.js - Integration Auth & CRUD Sesi Serta Search Real-Time */
 
-import { validateForm } from './utils.js';
+const API_AUTH_URL = 'http://localhost/pemweb-proyek-semester/api/auth.php';
+const API_SESI_URL = 'http://localhost/pemweb-proyek-semester/api/sesi.php';
 
-const API_URL = 'http://localhost/pemweb-obe/api/alats.php';
+const ROLE_KEY = 'absensi_user_role';
+const USER_KEY = 'absensi_user_name';
 
-// Selection DOM
-const daftar = document.querySelector('#daftar-alat');
-const apiMessage = document.querySelector('#api-message');
-const formAlat = document.querySelector('#form-alat');
-const formSummary = document.querySelector('#form-summary');
+// -------------------------------------------------------------
+// A. LOGIKA LOGIN (Hanya berjalan di login.html)
+// -------------------------------------------------------------
+const formLogin = document.querySelector('#form-login');
+if (formLogin) {
+  formLogin.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-// Modal Edit DOM
-const dialogEdit = document.querySelector('#dialog-edit');
-const formEditAlat = document.querySelector('#form-edit-alat');
-const btnCancelEdit = document.querySelector('#btn-cancel-edit');
+    const usernameInput = document.querySelector('#login-username')?.value.trim() || '';
+    const passwordInput = document.querySelector('#login-password')?.value || '';
+    const summaryMsg = document.querySelector('#login-summary');
 
-let dataInventaris = [];
-
-// ==========================================
-// 1. READ (LOAD DATA DARI API GET)
-// ==========================================
-async function loadInventarisData() {
-  if (apiMessage) {
-    apiMessage.textContent = 'Memuat data dari database MySQL...';
-    apiMessage.style.color = '#1e293b';
-  }
-
-  try {
-    const response = await fetch(API_URL);
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || 'Gagal memuat data dari server');
-    }
-
-    dataInventaris = result.data;
-
-    if (apiMessage) {
-      apiMessage.textContent = `Berhasil memuat ${dataInventaris.length} data alat dari database.`;
-      apiMessage.style.color = '#166534';
-    }
-
-    renderItems(dataInventaris);
-
-  } catch (error) {
-    console.error('Fetch Error:', error);
-    if (apiMessage) {
-      apiMessage.textContent = 'Gagal terhubung ke API backend.';
-      apiMessage.style.color = '#dc2626';
-    }
-  }
-}
-
-// ==========================================
-// RENDER DOM & TOMBOL ACTION (EDIT & DELETE)
-// ==========================================
-function renderItems(items) {
-  if (!daftar) return;
-  daftar.replaceChildren();
-
-  if (!items || items.length === 0) {
-    const pesanKosong = document.createElement('p');
-    pesanKosong.textContent = 'Tidak ada data inventaris yang ditemukan.';
-    daftar.append(pesanKosong);
-    return;
-  }
-
-  items.forEach((item) => {
-    const article = document.createElement('article');
-    article.className = 'card';
-
-    article.innerHTML = `
-      <h3>${item.nama}</h3>
-      <p>Kategori: <strong>${item.kategori}</strong> | Jumlah: <strong>${item.jumlah} unit</strong> | Kondisi: <strong>${item.kondisi}</strong></p>
-      <div class="card-actions" style="margin-top: 10px; display: flex; gap: 8px;">
-        <button type="button" class="btn-edit" data-id="${item.id}">Edit</button>
-        <button type="button" class="btn-delete" data-id="${item.id}" style="background-color: #dc2626; color: white;">Hapus</button>
-      </div>
-    `;
-
-    daftar.append(article);
-  });
-}
-
-// ==========================================
-// 2. CREATE (POST DATA KE API DATABASE)
-// ==========================================
-if (formAlat) {
-  formAlat.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    // Reset pesan error
-    const errorSpans = formAlat.querySelectorAll('.error-msg');
-    errorSpans.forEach((span) => (span.textContent = ''));
-
-    const rawData = new FormData(formAlat);
-    const formData = {
-      namaAlat: rawData.get('namaAlat')?.trim() || '',
-      kategori: rawData.get('kategori') || '',
-      jumlah: Number(rawData.get('jumlah')),
-      kondisi: rawData.get('kondisi') || '',
-      tanggalPerolehan: rawData.get('tanggalPerolehan') || ''
-    };
-
-    // Validasi Client-Side
-    const errors = validateForm(formData);
-    if (Object.keys(errors).length > 0) {
-      if (formSummary) {
-        formSummary.textContent = 'Terdapat kesalahan pada form. Silakan periksa kembali.';
-        formSummary.style.color = '#dc2626';
-      }
+    if (!usernameInput || !passwordInput) {
+      alert('Username (NIP/NIM) dan Kata Sandi wajib diisi!');
       return;
     }
 
-    // Payload dikirim ke Backend PHP (db: MySQL)
-    const payload = {
-      nama: formData.namaAlat,
-      kategori: formData.kategori,
-      jumlah: formData.jumlah,
-      kondisi: formData.kondisi
-    };
-
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_AUTH_URL}?action=login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: usernameInput, password: passwordInput })
       });
-
       const result = await response.json();
 
       if (response.ok && result.success) {
-        if (formSummary) {
-          formSummary.textContent = 'Data berhasil disimpan ke database!';
-          formSummary.style.color = '#166534';
+        localStorage.setItem(ROLE_KEY, result.data.role);
+        localStorage.setItem(USER_KEY, result.data.nama);
+
+        alert(`Login Berhasil!\nSelamat datang, ${result.data.nama}`);
+        window.location.href = (result.data.role === 'guru' || result.data.peran === 'Guru/Dosen') 
+          ? 'dashboard-guru.html' 
+          : 'dashboard-siswa.html';
+      } else {
+        if (summaryMsg) {
+          summaryMsg.style.display = 'block';
+          summaryMsg.textContent = result.message;
+        } else {
+          alert(result.message);
         }
-        formAlat.reset();
-        await loadInventarisData(); // Reload list otomatis dari DB
-      } else {
-        alert(`Gagal menambah data: ${result.message}`);
-      }
-    } catch (err) {
-      console.error('Submit Error:', err);
-      alert('Terjadi kesalahan koneksi ke server saat menyimpan data.');
-    }
-  });
-}
-
-// ==========================================
-// 3. UPDATE (PUT DATA VIA MODAL EDIT)
-// ==========================================
-function bukaModalEdit(id) {
-  const item = dataInventaris.find((a) => a.id === Number(id));
-  if (!item) return;
-
-  document.querySelector('#edit-id').value = item.id;
-  document.querySelector('#edit-nama').value = item.nama;
-  document.querySelector('#edit-kategori').value = item.kategori;
-  document.querySelector('#edit-jumlah').value = item.jumlah;
-  document.querySelector('#edit-kondisi').value = item.kondisi;
-
-  if (dialogEdit) dialogEdit.showModal();
-}
-
-if (btnCancelEdit && dialogEdit) {
-  btnCancelEdit.addEventListener('click', () => dialogEdit.close());
-}
-
-if (formEditAlat) {
-  formEditAlat.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.querySelector('#edit-id').value;
-
-    const payload = {
-      nama: document.querySelector('#edit-nama').value.trim(),
-      kategori: document.querySelector('#edit-kategori').value,
-      jumlah: Number(document.querySelector('#edit-jumlah').value),
-      kondisi: document.querySelector('#edit-kondisi').value
-    };
-
-    try {
-      const response = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        alert('Data berhasil diperbarui di database!');
-        if (dialogEdit) dialogEdit.close();
-        await loadInventarisData(); // Reload data
-      } else {
-        alert(`Gagal memperbarui data: ${result.message}`);
       }
     } catch (error) {
-      console.error('Update error:', error);
-      alert('Terjadi kesalahan koneksi saat memperbarui data.');
+      console.error('Login Error:', error);
+      alert('Koneksi ke server API gagal.');
     }
   });
 }
 
-// ==========================================
-// 4. DELETE (HAPUS DATA DENGAN KONFIRMASI)
-// ==========================================
-async function hapusAlat(id) {
-  if (!confirm('Apakah Anda yakin ingin menghapus data alat ini?')) return;
+// -------------------------------------------------------------
+// B. LOGIKA CRUD SESI & SEARCH (Hanya berjalan di dashboard-guru.html)
+// -------------------------------------------------------------
+async function muatDaftarSesi(query = '') {
+  const container = document.querySelector('#daftar-sesi');
+  if (!container) return;
 
   try {
-    const response = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: { 'Accept': 'application/json' }
-    });
-
+    const url = query ? `${API_SESI_URL}?q=${encodeURIComponent(query)}` : API_SESI_URL;
+    const response = await fetch(url);
     const result = await response.json();
 
-    if (response.ok && result.success) {
-      alert('Data berhasil dihapus!');
-      await loadInventarisData();
-    } else {
-      alert(`Gagal menghapus: ${result.message}`);
+    container.replaceChildren();
+
+    if (!response.ok || !result.success || !result.data || result.data.length === 0) {
+      container.innerHTML = '<p style="color:#64748b; font-style:italic;">Tidak ada sesi mata kuliah ditemukan.</p>';
+      return;
     }
-  } catch (error) {
-    console.error('Delete error:', error);
-    alert('Terjadi kesalahan koneksi saat menghapus data.');
+
+    result.data.forEach((item) => {
+      const card = document.createElement('article');
+      card.className = 'card-sesi';
+      card.style.cssText = 'border:1px solid #cbd5e1; padding:15px; border-radius:8px; margin-bottom:10px; background:var(--surface);';
+      card.innerHTML = `
+        <h3>${item.nama_sesi}</h3>
+        <p>Kode QR: <strong>${item.kode_qr}</strong> | Kategori: <strong>${item.kategori}</strong></p>
+        <p>Berlaku Sampai: ${item.berlaku_sampai}</p>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button type="button" style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;" onclick="bukaModalEdit(${item.id}, '${item.nama_sesi}', '${item.kode_qr}', '${item.kategori}', '${item.berlaku_sampai}')">Edit</button>
+          <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;" onclick="hapusSesi(${item.id})">Hapus</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error('Fetch Sesi Error:', err);
   }
 }
 
-// Event Delegation untuk Tombol Edit dan Hapus
-if (daftar) {
-  daftar.addEventListener('click', (event) => {
-    const target = event.target;
-    const id = target.dataset.id;
+// Input Search Real-Time
+const inputSearch = document.querySelector('#input-search');
+if (inputSearch) {
+  inputSearch.addEventListener('input', (e) => {
+    const kataKunci = e.target.value.trim();
+    muatDaftarSesi(kataKunci);
+  });
+}
 
-    if (target.classList.contains('btn-edit')) {
-      bukaModalEdit(id);
-    } else if (target.classList.contains('btn-delete')) {
-      hapusAlat(id);
+// Tambah Sesi (POST)
+const formCreate = document.querySelector('#form-buat-sesi');
+if (formCreate) {
+  formCreate.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      nama_sesi: document.querySelector('#nama_sesi').value.trim(),
+      kode_qr: document.querySelector('#kode_qr').value.trim(),
+      kategori: document.querySelector('#kategori').value,
+      berlaku_sampai: document.querySelector('#berlaku_sampai').value
+    };
+
+    try {
+      const res = await fetch(API_SESI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert('Sesi berhasil dibuat!');
+        formCreate.reset();
+        muatDaftarSesi();
+      } else {
+        alert(`Gagal: ${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
     }
   });
 }
 
-// Inisialisasi saat halaman dimuat
+// Edit Sesi (PUT)
+const modalEdit = document.querySelector('#modal-edit-sesi');
+const formEdit = document.querySelector('#form-edit-sesi');
+const btnCancel = document.querySelector('#btn-cancel-edit');
+
+window.bukaModalEdit = function(id, nama, kode, kat, berlaku) {
+  document.querySelector('#edit-id').value = id;
+  document.querySelector('#edit-nama_sesi').value = nama;
+  document.querySelector('#edit-kode_qr').value = kode;
+  document.querySelector('#edit-kategori').value = kat;
+  document.querySelector('#edit-berlaku_sampai').value = berlaku.replace(' ', 'T');
+  if (modalEdit) modalEdit.showModal();
+};
+
+if (btnCancel && modalEdit) {
+  btnCancel.addEventListener('click', () => modalEdit.close());
+}
+
+if (formEdit) {
+  formEdit.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.querySelector('#edit-id').value;
+    const payload = {
+      nama_sesi: document.querySelector('#edit-nama_sesi').value.trim(),
+      kode_qr: document.querySelector('#edit-kode_qr').value.trim(),
+      kategori: document.querySelector('#edit-kategori').value,
+      berlaku_sampai: document.querySelector('#edit-berlaku_sampai').value
+    };
+
+    try {
+      const res = await fetch(`${API_SESI_URL}?id=${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        alert('Sesi mata kuliah berhasil diperbarui!');
+        modalEdit.close();
+        muatDaftarSesi();
+      } else {
+        alert(`Gagal Edit: ${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+}
+
+// Hapus Sesi (DELETE)
+window.hapusSesi = async function(id) {
+  if (!confirm('Apakah Anda yakin ingin menghapus sesi ini?')) return;
+
+  try {
+    const res = await fetch(`${API_SESI_URL}?id=${id}`, { method: 'DELETE' });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      alert('Sesi berhasil dihapus!');
+      muatDaftarSesi();
+    } else {
+      alert(`Gagal Hapus: ${data.message}`);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Logout
+const btnLogout = document.querySelector('#btn-logout');
+if (btnLogout) {
+  btnLogout.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem(ROLE_KEY);
+    localStorage.removeItem(USER_KEY);
+    window.location.href = 'login.html';
+  });
+}
+
+// Inisialisasi Otomatis
 document.addEventListener('DOMContentLoaded', () => {
-  loadInventarisData();
+  muatDaftarSesi();
 });

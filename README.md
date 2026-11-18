@@ -1,10 +1,10 @@
-# Praktikum 1
+# Praktikum 12
 Nama Mahasiswa: Nazwa Salwa Adellia
 NPM : 2440304021
 Lokal : A1
 Angkatan : 2024
 
-# Pemrograman Web - Modul 1
+# Pemrograman Web - Modul 12
 Praktikum Pemrograman Web (OBE)
 
 # AbsensiQR - Landing Page System
@@ -12,52 +12,24 @@ Praktikum Pemrograman Web (OBE)
 Proyek ini merupakan implementasi halaman landing page untuk sistem absensi berbasis QR Code (**AbsensiQR**). Proyek dibuat menggunakan struktur HTML5 murni yang mematuhi standar aksesibilitas web dan hirarki dokumen yang baik.
 
 ---
-## Pertemuan 7 - Web API, Fetch, JSON, dan REST API
+## Modul 12: Autentikasi & Otorisasi
 
-### 1. Dokumentasi Endpoint API
-- **Endpoint Utama (Public REST API):** `https://jsonplaceholder.typicode.com/users`
-- **Fallback Lokal (Offline Mode):** `./data/users.json`
-- **HTTP Method:** `GET`
-- **Status Response Success:** `200 OK`
-- **Format Data:** `JSON` (Array of Objects)
+### 1. Alur Login Berbasis Session
+[Client] --(POST email/password)--> [Server PHP]
+                                          | Verify password_hash()
+                                          v
+[Client] <-- (Cookie: PHPSESSID) --- [Simpan Session ID di Server/Memory]
 
-### 2. Fitur Handling & UI State
-- **Async/Await & Fetch API:** Mengambil data publik/lokal secara asinkron tanpa reload halaman.
-- **Error Handling:** Pengecekan atribut `response.ok` dan pelemparan error HTTP status.
-- **Loading State:** Menampilkan indikator teks *"Memuat data dari API..."* saat proses fetch berlangsung.
-- **Error State:** Menampilkan pesan bantuan ramah berwarna merah jika jaringan terputus atau endpoint gagal diakses.
+### 2. Alur Hipotetis Berbasis JWT (JSON Web Token)
+[Client] --(POST email/password)--> [Server PHP]
+                                          | Verify & Generate Signed JWT
+                                          v
+[Client] <-- (Bearer Token JWT) ---- [Server Stateless (Tanpa simpan Session)]
 
-### Jawaban Latihan 3: Contoh POST Resource Baru & Header Content-Type
-#### A. Contoh Kode JavaScript (POST Request ke API):
-```javascript
-async function tambahAlatBaru(dataAlat) {
-  try {
-    const response = await fetch('[https://jsonplaceholder.typicode.com/posts](https://jsonplaceholder.typicode.com/posts)', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: JSON.stringify(dataAlat)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gagal mengirim data (HTTP ${response.status})`);
-    }
-
-    const hasil = await response.json();
-    console.log('Resource berhasil dibuat di server:', hasil);
-  } catch (error) {
-    console.error('POST Error:', error);
-  }
-}
-
-// Contoh Pemanggilan Fungsi:
-tambahAlatBaru({
-  nama: 'Barcode Scanner Wireless',
-  kategori: 'Perangkat',
-  jumlah: 3,
-  kondisi: 'Baik'
-});
+### 3. Perbedaan Utama Session vs JWT
+- **State:** Session bersifat *Stateful* (server menyimpan state pengguna di memori/server), sedangkan JWT bersifat *Stateless* (state tersimpan penuh dalam payload token terenkripsi/signed).
+- **Penyimpanan Token:** Session ID disimpan di Cookie browser (`HttpOnly`), sedangkan JWT biasanya disimpan di `localStorage` / `sessionStorage` / HTTP-Only Cookie.
+- **Logout / Revocation:** Session cukup dihapus dari server (`session_destroy()`), sedangkan JWT membutuhkan mekanisme *Token Blacklist* / *Refresh Token*.
 
 ## Cara Menjalankan Melalui Laragon 5
 

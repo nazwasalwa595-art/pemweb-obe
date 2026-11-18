@@ -409,3 +409,67 @@ html[data-theme="dark"] #filter-container select {
   border-radius: var(--radius, 12px);
   color: #166534;
 }
+
+/* Layout Form Autentikasi (Login & Register) */
+.auth-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  align-items: center;
+}
+
+.auth-info {
+  flex: 1 1 350px;
+}
+
+.auth-form-box {
+  flex: 1 1 350px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form-box p {
+  margin-bottom: 16px;
+}
+
+.auth-form-box label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.auth-form-box input,
+.auth-form-box select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #94a3b8;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 15px;
+}
