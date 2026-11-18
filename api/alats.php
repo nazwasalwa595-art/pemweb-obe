@@ -12,12 +12,18 @@ try {
     $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_VALIDATE_INT) : null;
 
     // ==========================================
-    // POIN 5 MODUL 12: PROTEKSI OTORISASI ROLE
-    // Membatasi request penulisan data (POST, PUT, PATCH, DELETE) 
-    // agar hanya bisa diakses oleh role 'admin' atau 'petugas'
+    // MODUL 12 & 13: PROTEKSI ROLE & CSRF TOKEN
     // ==========================================
     if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
         requireRole(['admin', 'petugas']);
+
+        // Ambil CSRF token dari header X-CSRF-Token atau body JSON
+        $rawBody = file_get_contents('php://input');
+        $bodyData = json_decode($rawBody, true);
+        $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN']
+            ?? (is_array($bodyData) ? ($bodyData['csrf_token'] ?? null) : null);
+
+        verifyCsrfToken(is_string($csrfToken) ? $csrfToken : null);
     }
 
     // ==========================================
@@ -51,10 +57,9 @@ try {
         // FILTER KATEGORI & PAGINATION
         $kategori = isset($_GET['kategori']) ? trim((string)$_GET['kategori']) : null;
         $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-        $limit = isset($_GET['limit']) ? max(1, min(50, (int)$_GET['limit'])) : 5; // Default 5 item per halaman
-        $offset = ($page - 1) * $limit; // Perbaikan sintaks offset
+        $limit = isset($_GET['limit']) ? max(1, min(50, (int)$_GET['limit'])) : 5;
+        $offset = ($page - 1) * $limit;
 
-        // Hitung total data untuk pagination meta
         if ($kategori) {
             $countStmt = db()->prepare('SELECT COUNT(*) FROM alat WHERE kategori = :kategori');
             $countStmt->execute(['kategori' => $kategori]);
@@ -64,7 +69,6 @@ try {
         $totalItems = (int)$countStmt->fetchColumn();
         $totalPages = (int)ceil($totalItems / $limit);
 
-        // Fetch data terpaginasi dari tabel 'alat'
         if ($kategori) {
             $query = 'SELECT * FROM alat WHERE kategori = :kategori ORDER BY id DESC LIMIT :limit OFFSET :offset';
             $stmt = db()->prepare($query);
@@ -101,16 +105,20 @@ try {
     // POST METHOD (CREATE - TERPROTEKSI)
     // ==========================================
     if ($method === 'POST') {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = is_array($bodyData ?? null) ? $bodyData : [];
 
         $nama = trim((string)($input['nama'] ?? ''));
         $kategori = trim((string)($input['kategori'] ?? ''));
         $jumlah = filter_var($input['jumlah'] ?? null, FILTER_VALIDATE_INT);
         $kondisi = trim((string)($input['kondisi'] ?? 'Baik'));
 
-        if ($nama === '' || $kategori === '' || $jumlah === false || $jumlah < 0) {
+        if (
+            $nama === '' || mb_strlen($nama) > 100 ||
+            $kategori === '' || mb_strlen($kategori) > 50 ||
+            $jumlah === false || $jumlah < 0
+        ) {
             http_response_code(422);
-            echo json_encode(['success' => false, 'message' => 'Data tidak valid. Nama dan kategori wajib diisi, jumlah >= 0'], JSON_UNESCAPED_UNICODE);
+            echo json_encode(['success' => false, 'message' => 'Data tidak valid. Nama (maks 100) & kategori (maks 50) wajib diisi, jumlah >= 0'], JSON_UNESCAPED_UNICODE);
             exit;
         }
 
@@ -144,13 +152,17 @@ try {
             exit;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = is_array($bodyData ?? null) ? $bodyData : [];
         $nama = trim((string)($input['nama'] ?? ''));
         $kategori = trim((string)($input['kategori'] ?? ''));
         $jumlah = filter_var($input['jumlah'] ?? null, FILTER_VALIDATE_INT);
         $kondisi = trim((string)($input['kondisi'] ?? 'Baik'));
 
-        if ($nama === '' || $kategori === '' || $jumlah === false || $jumlah < 0) {
+        if (
+            $nama === '' || mb_strlen($nama) > 100 ||
+            $kategori === '' || mb_strlen($kategori) > 50 ||
+            $jumlah === false || $jumlah < 0
+        ) {
             http_response_code(422);
             echo json_encode(['success' => false, 'message' => 'Data tidak valid'], JSON_UNESCAPED_UNICODE);
             exit;
@@ -196,6 +208,7 @@ try {
     echo json_encode(['success' => false, 'message' => 'Method HTTP tidak diizinkan'], JSON_UNESCAPED_UNICODE);
 
 } catch (Throwable $e) {
+    error_log('Alats API error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,

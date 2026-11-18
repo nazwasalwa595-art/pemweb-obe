@@ -55,8 +55,12 @@ session_regenerate_id(true);
 $_SESSION['user_id'] = (int) $user['id'];
 $_SESSION['role'] = $user['role'];
 
+// Generate CSRF token untuk session aktif ini
+$csrfToken = getCsrfToken();
+
 echo json_encode([
     'message' => 'Login berhasil',
+    'csrf_token' => $csrfToken,
     'user' => [
         'id' => (int) $user['id'],
         'nama' => $user['nama'],

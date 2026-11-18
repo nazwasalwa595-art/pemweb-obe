@@ -40,3 +40,27 @@ function requireRole(array $roles): void {
         exit;
     }
 }
+
+// ==========================================
+// MODUL 13: CSRF TOKEN HELPERS
+// ==========================================
+function getCsrfToken(): string {
+    startAuthSession();
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verifyCsrfToken(?string $token): void {
+    startAuthSession();
+    if (
+        empty($token) ||
+        empty($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $token)
+    ) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Invalid atau missing CSRF token'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
