@@ -473,3 +473,56 @@ html[data-theme="dark"] #filter-container select {
   text-align: center;
   margin-top: 15px;
 }
+
+/* ===== AbsensiQR: responsif 320px & aksesibilitas ===== */
+[hidden] { display: none !important; }
+img { max-width: 100%; height: auto; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.form-stack p { margin-bottom: 1rem; }
+.form-stack label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+.form-stack input, .form-stack select {
+  width: 100%; padding: 0.6rem 0.75rem; font: inherit;
+  border: 1px solid #94a3b8; border-radius: 6px; background: #fff; color: var(--text);
+}
+
+.btn-primary, .btn-secondary {
+  width: 100%; padding: 0.7rem 1.25rem; border: none; border-radius: 6px;
+  font-weight: 600; font-size: 1rem; cursor: pointer; margin-bottom: 0.5rem;
+}
+.btn-secondary { background: #475569; color: #fff; }
+.btn-secondary:hover { background: #334155; }
+
+.error-msg { color: #b91c1c; font-weight: 500; }
+.success-msg { color: #166534; font-weight: 500; }
+.error-msg:empty, .success-msg:empty, #form-summary:empty, #scan-summary:empty { display: none; }
+
+.table-wrap { overflow-x: auto; }   /* tabel scroll di dalam wadah, halaman tidak ikut scroll */
+table { width: 100%; border-collapse: collapse; min-width: 28rem; }
+th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid #e2e8f0; }
+
+.sesi-item { border: 1px solid #cbd5e1; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+.aksi { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.aksi button, .btn-link {
+  background: #2563eb; color: #fff; border: none; padding: 0.45rem 0.9rem;
+  border-radius: 6px; cursor: pointer; font: inherit;
+}
+.aksi button:hover, .btn-link:hover { background: #1d4ed8; }
+.aksi .hapus { background: #b91c1c; }
+
+.qr-wrap { display: flex; flex-direction: column; align-items: center; margin: 1rem 0; }
+#reader { width: 100%; max-width: 20rem; margin-bottom: 1rem; }
+
+footer { flex-wrap: wrap; gap: 0.5rem; color: #475569; }

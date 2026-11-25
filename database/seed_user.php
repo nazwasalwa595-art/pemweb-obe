@@ -8,46 +8,32 @@ if (PHP_SAPI !== 'cli') {
 
 require_once __DIR__ . '/../config/database.php';
 
+$password = 'password123';
+$hash = password_hash($password, PASSWORD_BCRYPT);
+
+$users = [
+    ['username' => '198001012005011001', 'nama' => 'Dosen Pemweb',     'email' => 'dosen@absensiqr.test',     'peran' => 'Guru/Dosen'],
+    ['username' => '2440000001',         'nama' => 'Mahasiswa Contoh', 'email' => 'mahasiswa@absensiqr.test', 'peran' => 'Siswa/Mahasiswa'],
+];
+
 try {
     $pdo = db();
-    
-    // Hash resmi BCRYPT untuk password: "password123"
-    $password = 'password123';
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-
-    // Data User Dummy yang di-seed (Petugas & Viewer)
-    $users = [
-        [
-            'nama' => 'Petugas Lab',
-            'email' => 'petugas@pemweb.test',
-            'role' => 'petugas'
-        ],
-        [
-            'nama' => 'Siswa Viewer',
-            'email' => 'viewer@pemweb.test',
-            'role' => 'viewer'
-        ]
-    ];
-
-    $checkStmt = $pdo->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
-    $updateStmt = $pdo->prepare('UPDATE users SET nama = ?, password_hash = ?, role = ? WHERE id = ?');
-    $insertStmt = $pdo->prepare('INSERT INTO users (nama, email, password_hash, role) VALUES (?, ?, ?, ?)');
+    $cek = $pdo->prepare('SELECT id FROM users WHERE username = ? LIMIT 1');
+    $ubah = $pdo->prepare('UPDATE users SET nama = ?, email = ?, password = ?, peran = ? WHERE id = ?');
+    $tambah = $pdo->prepare('INSERT INTO users (username, nama, email, password, peran) VALUES (?, ?, ?, ?, ?)');
 
     foreach ($users as $u) {
-        $checkStmt->execute([$u['email']]);
-        $userId = $checkStmt->fetchColumn();
-
-        if ($userId !== false) {
-            $updateStmt->execute([$u['nama'], $hash, $u['role'], $userId]);
-            echo "User '{$u['email']}' (Role: {$u['role']}) berhasil diperbarui.\n";
+        $cek->execute([$u['username']]);
+        $id = $cek->fetchColumn();
+        if ($id !== false) {
+            $ubah->execute([$u['nama'], $u['email'], $hash, $u['peran'], $id]);
+            echo "Diperbarui : {$u['username']} ({$u['peran']})\n";
         } else {
-            $insertStmt->execute([$u['nama'], $u['email'], $hash, $u['role']]);
-            echo "User '{$u['email']}' (Role: {$u['role']}) berhasil ditambahkan.\n";
+            $tambah->execute([$u['username'], $u['nama'], $u['email'], $hash, $u['peran']]);
+            echo "Ditambahkan: {$u['username']} ({$u['peran']})\n";
         }
     }
-
-    echo "\nSeeding Selesai! Kedua user dapat login menggunakan password: {$password}\n";
-
+    echo "\nSelesai. Password semua akun: {$password}\n";
 } catch (Throwable $e) {
-    echo "Error Seeding: " . $e->getMessage() . "\n";
+    echo 'Error seeding: ' . $e->getMessage() . "\n";
 }

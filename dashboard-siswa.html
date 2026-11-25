@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard siswa dan mahasiswa AbsensiQR">
+  <title>Dashboard Siswa/Mahasiswa - AbsensiQR</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a href="#main">Lewati ke konten utama</a>
+    <p><strong>AbsensiQR</strong></p>
+    <nav aria-label="Navigasi Utama">
+      <button type="button" id="btn-logout" class="btn-link">Keluar</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="panel">
+      <h1 id="welcome-title">Memuat...</h1>
+      <p id="user-info"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Scan Presensi</h2>
+      <p id="scan-summary" role="alert"></p>
+
+      <div class="form-stack">
+        <p>
+          <label for="status">Status Kehadiran</label>
+          <select id="status">
+            <option value="Hadir">Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+          </select>
+        </p>
+      </div>
+
+      <div id="reader"></div>
+      <p>
+        <button type="button" id="btn-scan" class="btn-primary">Mulai Scan Kamera</button>
+        <button type="button" id="btn-stop" class="btn-secondary" hidden>Hentikan Kamera</button>
+      </p>
+
+      <form id="form-manual" class="form-stack" action="#" method="POST" novalidate>
+        <p>
+          <label for="kode-manual">Atau masukkan kode QR secara manual</label>
+          <input id="kode-manual" type="text" maxlength="50" placeholder="Contoh: QR-PEMWEB-01" autocomplete="off">
+        </p>
+        <button type="submit" class="btn-primary">Kirim Presensi</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Riwayat Kehadiran</h2>
+      <p id="riwayat-message" aria-live="polite"></p>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Riwayat kehadiran Anda</caption>
+          <thead>
+            <tr>
+              <th scope="col">Sesi</th>
+              <th scope="col">Kode QR</th>
+              <th scope="col">Waktu</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="riwayat-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 AbsensiQR. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script type="module" src="js/siswa.js"></script>
+</body>
+</html>

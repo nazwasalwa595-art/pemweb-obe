@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard guru dan dosen AbsensiQR">
+  <title>Dashboard Guru/Dosen - AbsensiQR</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a href="#main">Lewati ke konten utama</a>
+    <p><strong>AbsensiQR</strong></p>
+    <nav aria-label="Navigasi Utama">
+      <button type="button" id="btn-logout" class="btn-link">Keluar</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="panel">
+      <h1 id="welcome-title">Memuat...</h1>
+      <p id="user-info"></p>
+    </section>
+
+    <section class="panel">
+      <h2 id="judul-form">Buat Sesi Absensi</h2>
+      <p id="form-summary" role="alert"></p>
+      <form id="form-sesi" class="form-stack" action="#" method="POST" novalidate>
+        <p>
+          <label for="nama-sesi">Nama Mata Kuliah / Sesi *</label>
+          <input id="nama-sesi" type="text" maxlength="100" placeholder="Contoh: Pemrograman Web" required>
+        </p>
+        <p>
+          <label for="kode-qr">Kode QR * (huruf, angka, - atau _)</label>
+          <input id="kode-qr" type="text" maxlength="50" placeholder="Contoh: QR-PEMWEB-01" required>
+        </p>
+        <p>
+          <label for="berlaku-sampai">Batas Waktu Absen *</label>
+          <input id="berlaku-sampai" type="datetime-local" required>
+        </p>
+        <button type="submit" id="btn-simpan" class="btn-primary">Buat Sesi</button>
+        <button type="button" id="btn-batal" class="btn-secondary" hidden>Batal</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Daftar Sesi Saya</h2>
+      <p id="list-message" aria-live="polite"></p>
+      <div id="daftar-sesi"></div>
+    </section>
+
+    <section id="panel-detail" class="panel" hidden>
+      <h2 id="detail-judul">QR Code Sesi</h2>
+      <figure class="qr-wrap">
+        <div id="qr-box"></div>
+        <figcaption>Kode: <strong id="qr-kode"></strong></figcaption>
+      </figure>
+
+      <h3>Rekap Kehadiran</h3>
+      <p id="rekap-kosong">Belum ada yang melakukan presensi.</p>
+      <div class="table-wrap">
+        <table>
+          <caption class="sr-only">Rekap kehadiran mahasiswa pada sesi terpilih</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nama</th>
+              <th scope="col">Username</th>
+              <th scope="col">Status</th>
+              <th scope="col">Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="rekap-body"></tbody>
+        </table>
+      </div>
+      <p><button type="button" id="btn-refresh" class="btn-secondary">Muat Ulang</button></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 AbsensiQR. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/guru.js"></script>
+</body>
+</html>

@@ -1,13 +1,36 @@
 <?php
 declare(strict_types=1);
 
-function startAuthSession(): void {
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        return;
+const PERAN_GURU  = 'Guru/Dosen';
+const PERAN_SISWA = 'Siswa/Mahasiswa';
+
+function kirimJson(array $data, int $status = 200): never {
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+function galat(string $pesan, int $status): never {
+    kirimJson(['success' => false, 'message' => $pesan], $status);
+}
+
+function bacaBodyJson(): array {
+    $data = json_decode(file_get_contents('php://input') ?: '', true);
+    return is_array($data) ? $data : [];
+}
+
+function wajibMethod(array $diizinkan): void {
+    if (!in_array($_SERVER['REQUEST_METHOD'], $diizinkan, true)) {
+        header('Allow: ' . implode(', ', $diizinkan));
+        galat('Method tidak diizinkan', 405);
     }
+}
+
+function startAuthSession(): void {
+    if (session_status() === PHP_SESSION_ACTIVE) return;
 
     $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
@@ -15,35 +38,23 @@ function startAuthSession(): void {
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
-
     session_start();
 }
 
 function requireLogin(): void {
-    if (session_status() === PHP_SESSION_NONE) {
-        startAuthSession();
-    }
-
+    startAuthSession();
     if (empty($_SESSION['user_id'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Silakan login terlebih dahulu'], JSON_UNESCAPED_UNICODE);
-        exit;
+        galat('Silakan login terlebih dahulu', 401);
     }
 }
 
-function requireRole(array $roles): void {
+function requireRole(array $peran): void {
     requireLogin();
-
-    if (!in_array($_SESSION['role'] ?? '', $roles, true)) {
-        http_response_code(403);
-        echo json_encode(['error' => 'Akses ditolak'], JSON_UNESCAPED_UNICODE);
-        exit;
+    if (!in_array($_SESSION['role'] ?? '', $peran, true)) {
+        galat('Akses ditolak', 403);
     }
 }
 
-// ==========================================
-// MODUL 13: CSRF TOKEN HELPERS
-// ==========================================
 function getCsrfToken(): string {
     startAuthSession();
     if (empty($_SESSION['csrf_token'])) {
@@ -52,15 +63,10 @@ function getCsrfToken(): string {
     return $_SESSION['csrf_token'];
 }
 
-function verifyCsrfToken(?string $token): void {
+function verifyCsrfToken(): void {
     startAuthSession();
-    if (
-        empty($token) ||
-        empty($_SESSION['csrf_token']) ||
-        !hash_equals($_SESSION['csrf_token'], $token)
-    ) {
-        http_response_code(403);
-        echo json_encode(['error' => 'Invalid atau missing CSRF token'], JSON_UNESCAPED_UNICODE);
-        exit;
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if ($token === '' || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+        galat('Token CSRF tidak valid', 403);
     }
 }

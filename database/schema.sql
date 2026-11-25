@@ -1,0 +1,42 @@
+CREATE DATABASE IF NOT EXISTS pemweb_obe
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE pemweb_obe;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS presensi;
+DROP TABLE IF EXISTS sesi_qr;
+DROP TABLE IF EXISTS peminjaman;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(18) NOT NULL UNIQUE,          -- NIM/NIS/NPM atau NIP/NIDN (angka)
+  nama VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,                -- hash BCRYPT
+  peran ENUM('Siswa/Mahasiswa','Guru/Dosen') NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE sesi_qr (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  dosen_id INT UNSIGNED NOT NULL,
+  nama_sesi VARCHAR(100) NOT NULL,
+  kode_qr VARCHAR(50) NOT NULL UNIQUE,
+  berlaku_sampai DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_sesi_dosen FOREIGN KEY (dosen_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE presensi (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  sesi_id INT UNSIGNED NOT NULL,
+  waktu_absen DATETIME NOT NULL,
+  status ENUM('Hadir','Izin','Sakit') NOT NULL DEFAULT 'Hadir',
+  UNIQUE KEY uq_presensi (user_id, sesi_id),     -- 1 siswa hanya 1x per sesi
+  CONSTRAINT fk_presensi_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_presensi_sesi FOREIGN KEY (sesi_id) REFERENCES sesi_qr(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+SET FOREIGN_KEY_CHECKS = 1;

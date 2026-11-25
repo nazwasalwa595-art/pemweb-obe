@@ -1,12 +1,14 @@
 <?php
 declare(strict_types=1);
 
-ini_set('display_errors', '0');
+ini_set('display_errors', '0');   // mode produksi: jangan tampilkan error mentah
+ini_set('log_errors', '1');
+date_default_timezone_set('Asia/Makassar');
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+$dotenv->safeLoad();
 
 function db(): PDO {
     static $pdo = null;
@@ -18,8 +20,7 @@ function db(): PDO {
     $pass = $_ENV['DB_PASS'] ?? '';
 
     try {
-        $dsn = "mysql:host={$host};dbname={$name};charset=utf8mb4";
-        $pdo = new PDO($dsn, $user, $pass, [
+        $pdo = new PDO("mysql:host={$host};dbname={$name};charset=utf8mb4", $user, $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
@@ -28,9 +29,8 @@ function db(): PDO {
         error_log('Database connection error: ' . $e->getMessage());
         http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['error' => 'Koneksi layanan bermasalah'], JSON_UNESCAPED_UNICODE);
+        echo json_encode(['success' => false, 'message' => 'Koneksi layanan bermasalah'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-
     return $pdo;
 }

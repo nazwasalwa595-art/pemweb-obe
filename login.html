@@ -3,69 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Masuk ke sistem AbsensiQR">
   <title>Masuk - AbsensiQR</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Header & Navigasi -->
   <header>
-    <a href="#main" class="skip-link">Lewati ke konten utama</a>
-    <img src="logo_absensiqr.png" alt="Logo AbsensiQR" width="90">
-    <h1>Absensi<span>QR</span></h1>
+    <a href="#main">Lewati ke konten utama</a>
+    <p><strong>AbsensiQR</strong></p>
     <nav aria-label="Navigasi Utama">
       <a href="index.html">Beranda</a>
-      <a href="login.html" class="nav-btn-login">Masuk</a>
+      <a href="login.html">Masuk</a>
       <a href="register.html">Daftar</a>
     </nav>
   </header>
 
-  <!-- Konten Utama Form Login -->
   <main id="main">
     <section class="auth-container">
-      
       <article class="auth-info">
-        <h2>Masuk ke AbsensiQR</h2>
-        <p>Silakan masukkan Username (NIM/NIP) dan kata sandi Anda.</p>
+        <h1>Masuk ke AbsensiQR</h1>
+        <p>Masukkan username (NIM/NIP) dan kata sandi Anda.</p>
         <figure>
-          <img src="gambar_ilustrasi_scanqr.png" alt="Ilustrasi Login AbsensiQR" width="220">
+          <img src="Ilustrasi_qr_code.png" alt="Ilustrasi pemindaian QR Code absensi" width="220">
         </figure>
       </article>
 
       <article class="auth-form-box">
-        <p id="login-summary" class="error-summary" aria-live="polite" style="color: #dc2626; font-weight: bold; display: none;"></p>
-
-        <form id="form-login" action="#" method="POST" novalidate>
+        <p id="form-summary" role="alert"></p>
+        <form id="form-login" class="form-stack" action="#" method="POST" novalidate>
           <p>
             <label for="login-username">Username (NIM / NIP) *</label>
-            <input 
-              id="login-username" 
-              name="username" 
-              type="text" 
-              placeholder="Masukkan NIP atau NIM Anda" 
-              required
-            >
+            <input id="login-username" name="username" type="text" inputmode="numeric" maxlength="18"
+                   autocomplete="username" placeholder="Masukkan NIM atau NIP" required>
           </p>
-
           <p>
             <label for="login-password">Kata Sandi *</label>
-            <input 
-              id="login-password" 
-              name="password" 
-              type="password" 
-              placeholder="Masukkan kata sandi" 
-              required
-            >
+            <input id="login-password" name="password" type="password"
+                   autocomplete="current-password" placeholder="Masukkan kata sandi" required>
           </p>
-
-          <button type="submit" id="btn-submit-login" class="btn-primary">Masuk Sekarang</button>
+          <button type="submit" class="btn-primary">Masuk Sekarang</button>
         </form>
-
-        <p class="auth-link">
-          Belum punya akun? <a href="register.html">Daftar di sini</a>
-        </p>
+        <p class="auth-link">Belum punya akun? <a href="register.html">Daftar di sini</a></p>
       </article>
-
     </section>
   </main>
 
@@ -73,6 +52,6 @@
     <p>&copy; 2026 AbsensiQR. All rights reserved.</p>
   </footer>
 
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/auth.js"></script>
 </body>
 </html>
